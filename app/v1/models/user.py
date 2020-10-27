@@ -1,4 +1,4 @@
-from flask_restplus import fields
+from flask_restx import fields
 from sqlalchemy.orm import relationship
 from werkzeug.security import generate_password_hash
 from app.v1 import v1_api
@@ -10,6 +10,7 @@ class User(db.Model):
     username = db.Column(db.String(50))
     password_hash = db.Column(db.String(80))
     credits = db.Column(db.Integer)
+    administrator = db.Column(db.Boolean)
     from .auth import RefreshToken
     refresh_tokens = relationship('RefreshToken', backref='user')
 

@@ -1,5 +1,5 @@
 from flask import current_app, request
-from flask_restplus import Resource, Namespace, fields
+from flask_restx import Resource, Namespace, fields
 from ..models.user import User
 from ..models.auth import RefreshToken
 from app import db
@@ -10,7 +10,15 @@ import jwt
 import datetime
 import hashlib
 from ..utils import token_required, administrator
+
 auth_ns = Namespace('auth')
+
+parser = auth_ns.parser()
+parser.add_argument('Authorization', type=str,
+                    location='headers',
+                    help='Bearer Access Token',
+                    required=True
+                    )
 
 register_model = v1_api.model('Register', {
     'username': fields.String(required=True),
@@ -31,7 +39,7 @@ class Register(Resource):
     # 6-64 symbols, required upper and lower case letters. Can contain !@#$%_  .
     PASSWORD_REGEXP = r'^(?=.*[\d])(?=.*[A-Z])(?=.*[a-z])[\w\d!@#$%_]{6,64}$'
 
-    @auth_ns.expect(register_model, validate=True)
+    @auth_ns.expect(parser, register_model, validate=True)
     @auth_ns.marshal_with(User.user_resource_model)
     @auth_ns.response(400, 'username or password incorrect')
     @token_required
@@ -49,7 +57,8 @@ class Register(Resource):
         if User.query.filter_by(username=v1_api.payload['username']).first():
             raise ValidationException(error_field_name='username', message='This username is already exists')
 
-        user = User(username=v1_api.payload['username'], password=v1_api.payload['password'])
+        user = User(username=v1_api.payload['username'], password=v1_api.payload['password'], credits=0,
+                    administrator=False)
         db.session.add(user)
         db.session.commit()
         return user
