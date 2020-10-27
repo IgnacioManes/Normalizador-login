@@ -2,6 +2,10 @@ from app import create_app
 import os
 from flask_script import Manager
 from app import db
+from dotenv import load_dotenv
+from pathlib import Path  # Python 3.6+ only
+env_path = Path('.') / '.env'
+load_dotenv(dotenv_path=env_path)
 
 app = create_app(os.environ['CONFIG_TYPE'])
 manager = Manager(app)

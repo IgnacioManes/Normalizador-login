@@ -12,7 +12,6 @@ def token_required(f):
         if auth_header:
             try:
                 access_token = auth_header.split(' ')[1]
-
                 try:
                     token = jwt.decode(access_token, current_app.config['SECRET_KEY'])
                     current_user = User.query.get(token['uid'])
@@ -29,6 +28,33 @@ def token_required(f):
             v1_api.abort(403, 'Token required')
         return f(*args, **kwargs, current_user=current_user)
 
+    wrapper.__doc__ = f.__doc__
+    wrapper.__name__ = f.__name__
+    return wrapper
+
+
+# administrator decorator
+def administrator(f):
+    def wrapper(*args, **kwargs):
+        current_user = kwargs['current_user']
+        if current_user['administrator']:
+            return f(*args, **kwargs, current_user=current_user)
+        else:
+            v1_api.abort(403, 'Permission denied')
+    wrapper.__doc__ = f.__doc__
+    wrapper.__name__ = f.__name__
+    return wrapper
+
+
+def discount_credits(f):
+    def wrapper(*args, **kwargs):
+        try:
+            response = f(*args, **kwargs)
+            if response.status_code == 200:
+                print(kwargs['current_user']['credits'])
+            return response
+        except Exception as e:
+            v1_api.abort(500, e)
     wrapper.__doc__ = f.__doc__
     wrapper.__name__ = f.__name__
     return wrapper

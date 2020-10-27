@@ -9,7 +9,7 @@ import re
 import jwt
 import datetime
 import hashlib
-
+from ..utils import token_required, administrator
 auth_ns = Namespace('auth')
 
 register_model = v1_api.model('Register', {
@@ -34,6 +34,8 @@ class Register(Resource):
     @auth_ns.expect(register_model, validate=True)
     @auth_ns.marshal_with(User.user_resource_model)
     @auth_ns.response(400, 'username or password incorrect')
+    @token_required
+    @administrator
     def post(self):
         if not re.search(self.USERNAME_REGEXP, v1_api.payload['username']):
             raise ValidationException(error_field_name='username',
@@ -139,7 +141,8 @@ class Refresh(Resource):
             auth_ns.abort(401, 'Unknown token error')
 
 
-from ..utils import token_required
+from ..utils import token_required, token_required, administrator, token_required, administrator, administrator, \
+    token_required
 
 
 # This resource only for test

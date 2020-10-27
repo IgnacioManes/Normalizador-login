@@ -1,5 +1,8 @@
+from dotenv import load_dotenv
+from pathlib import Path  # Python 3.6+ only
+env_path = Path('.') / '.env'
+load_dotenv(dotenv_path=env_path)
 import os
-import tempfile
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 
@@ -7,8 +10,8 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 class Config(object):
     DEBUG = False
     TESTING = False
-    SECRET_KEY = 'top-secret'
-    JWT_SECRET_KEY = SECRET_KEY
+    SECRET_KEY = os.environ.get('SECRET_KEY')
+    JWT_SECRET_KEY = os.environ.get('SECRET_KEY')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
 
