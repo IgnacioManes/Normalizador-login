@@ -29,7 +29,7 @@ class UserList(Resource):
 
 @user_ns.route('/<int:id>')
 class User(Resource):
-    @user_ns.response(404, 'Todo not found or you don\'t have permission to edit it')
+    @user_ns.response(404, 'User not found or you don\'t have permission to edit it')
     @user_ns.expect(UserModel.user_resource_model, validate=True)
     @user_ns.marshal_with(UserModel.user_resource_model)
     @user_ns.doc('Access Token', parser=parser)
